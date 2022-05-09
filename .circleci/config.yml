@@ -2,13 +2,20 @@ version: 2.1
 orbs:
   node: circleci/node@4.7.0
 jobs:
-  build:
-    executor:
-      name: node/default
-      tag: '10.4'
-    steps:
-      - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-      - run: npm run build 
+  build: # this can be any name you choose
+      docker:
+        - image: cimg/node:17.2.0
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: yarn
+        - run:
+            command: yarn build
+            name: Build app
+        - persist_to_workspace:
+            root: ~/project
+            paths: .
+workflows:
+  build_app:
+    jobs:
+      - build
